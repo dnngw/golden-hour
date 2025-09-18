@@ -38,6 +38,7 @@ const BenefitSection = () => {
     <div className="flex gap-2 flex-col md:flex-row">
       {items.map((item) => (
         <BenefitCard
+          key={item.title}
           icon={item.icon}
           title={item.title}
           description={item.description}
