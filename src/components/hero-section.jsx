@@ -1,6 +1,6 @@
 const HeroSection = () => {
   return (
-    <div className="m-2">
+    <div className="m-2 mb-10 text-white">
       <h1 className="text-center font-bold text-3xl">
         Discover Your Perfect Golden Hour
       </h1>
