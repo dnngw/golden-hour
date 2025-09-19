@@ -15,9 +15,12 @@ import {
   goldenHourRequestSchema,
   goldenHourResponseSchema,
 } from "@/api/schemas/goldenhour";
+import GoldenhourModal from "./common/goldenhour-modal";
+
 
 const AutoDetectionLocation = () => {
-  const [result, setResult] = useState();
+  const [result, setResult] = useState({});
+  const [open, setOpen] = useState(false);
 
   const getLocation = async () => {
     try {
@@ -42,37 +45,43 @@ const AutoDetectionLocation = () => {
 
         const validatedResponse = goldenHourResponseSchema.parse(response);
         setResult(validatedResponse);
+        setOpen(true);
       }
     } catch (err) {
       console.error("invalid geolocation :", err.message);
     }
   };
 
-  console.log(result);
-
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <div className="bg-blue-500 rounded-md p-2">
-            <Navigation size={16} color="white" />
-          </div>{" "}
-          Auto Detection
-        </CardTitle>
-        <CardDescription>
-          Use your device's GPS to automatically detect your current location
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Button
-          onClick={() => getLocation()}
-          className="bg-blue-500 flex w-full"
-        >
-          <Navigation size={16} />
-          Detect My Location
-        </Button>
-      </CardContent>
-    </Card>
+    <>
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <div className="bg-blue-500 rounded-md p-2">
+              <Navigation size={16} color="white" />
+            </div>{" "}
+            Auto Detection
+          </CardTitle>
+          <CardDescription>
+            Use your device's GPS to automatically detect your current location
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button
+            onClick={() => getLocation()}
+            className="bg-blue-500 flex w-full"
+          >
+            <Navigation size={16} />
+            Detect My Location
+          </Button>
+        </CardContent>
+      </Card>
+      <GoldenhourModal
+        open={open}
+        setOpen={setOpen}
+        data={result}
+      />
+    </>
   );
 };
 

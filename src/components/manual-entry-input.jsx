@@ -43,7 +43,7 @@ const ManualEntryInput = () => {
       const validatedResponse = geoLocationResponseSchema.parse(response);
       const { latitude: lat, longitude: lng } = validatedResponse.results[0];
 
-      getGoldenHourData({ lat, lng });
+      await getGoldenHourData({ lat, lng });
       reset();
     } catch (err) {
       console.error(err);
