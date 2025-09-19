@@ -17,32 +17,34 @@ import {
 } from "@/api/schemas/goldenhour";
 
 const AutoDetectionLocation = () => {
-  const [geoData, setGeoData] = useState();
   const [result, setResult] = useState();
 
   const getLocation = async () => {
     try {
       if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setGeoData({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            });
-          },
-          (error) => {
-            console.error("error location :", error.message);
-          }
-        );
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(
+            (position) => resolve(position),
+            (error) => reject(error)
+          );
+        });
+
+        const locationData = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+
+        const validatedData = goldenHourRequestSchema.parse(locationData);
+        const response = await getGoldenHour({
+          ...validatedData,
+          formatted: 0,
+        });
+
+        const validatedResponse = goldenHourResponseSchema.parse(response);
+        setResult(validatedResponse);
       }
-
-      const validatedData = goldenHourRequestSchema.parse(geoData);
-      const response = await getGoldenHour(validatedData);
-
-      const validatedResponse = goldenHourResponseSchema.parse(response);
-      setResult(validatedResponse);
     } catch (err) {
-      console.error("failed to get location:", err.message);
+      console.error("invalid geolocation :", err.message);
     }
   };
 
