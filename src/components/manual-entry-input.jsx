@@ -23,9 +23,11 @@ import {
   goldenHourRequestSchema,
   goldenHourResponseSchema,
 } from "@/api/schemas/goldenhour";
+import GoldenhourModal from "./common/goldenhour-modal";
 
 const ManualEntryInput = () => {
-  const [data, setData] = useState();
+  const [data, setData] = useState({});
+  const [open, setOpen] = useState(false);
 
   const {
     register,
@@ -40,11 +42,16 @@ const ManualEntryInput = () => {
 
       const response = await getGeoLocation(validatedData);
 
-      const validatedResponse = geoLocationResponseSchema.parse(response);
-      const { latitude: lat, longitude: lng } = validatedResponse.results[0];
+      if (response?.results && response.results.length > 0) {
+        const validatedResponse = geoLocationResponseSchema.parse(response);
+        const { latitude: lat, longitude: lng } = validatedResponse.results[0];
 
-      await getGoldenHourData({ lat, lng });
-      reset();
+        await getGoldenHourData({ lat, lng });
+        reset();
+        setOpen(true);
+      } else {
+        return null;
+      }
     } catch (err) {
       console.error(err);
     }
@@ -66,43 +73,44 @@ const ManualEntryInput = () => {
     }
   };
 
-  console.log(data);
-
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex gap-2 items-center">
-          <div className="bg-gray-300 p-2 rounded-md">
-            <MapPin size={16} />
-          </div>
-          Manual Entry
-        </CardTitle>
-        <CardDescription>
-          Enter a city name or address to get location-based data
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-3">
-        <form onSubmit={handleSubmit(getGeoLocationData)}>
-          <div>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Enter City Name"
-              {...register("name", {
-                required: "Input is required",
-              })}
-            />
-            {errors.location && (
-              <p className="text-red-500">{errors.location.message}</p>
-            )}
-          </div>
-          <Button className="flex w-full" variant="outline" type="submit">
-            <Search size={16} />
-            Search Location
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+    <>
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex gap-2 items-center">
+            <div className="bg-gray-300 p-2 rounded-md">
+              <MapPin size={16} />
+            </div>
+            Manual Entry
+          </CardTitle>
+          <CardDescription>
+            Enter a city name or address to get location-based data
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-3">
+          <form onSubmit={handleSubmit(getGeoLocationData)}>
+            <div>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Enter City Name"
+                {...register("name", {
+                  required: "Input is required",
+                })}
+              />
+              {errors.location && (
+                <p className="text-red-500">{errors.location.message}</p>
+              )}
+            </div>
+            <Button className="flex w-full" variant="outline" type="submit">
+              <Search size={16} />
+              Search Location
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+      <GoldenhourModal open={open} setOpen={setOpen} data={data} />
+    </>
   );
 };
 
